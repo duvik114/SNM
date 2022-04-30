@@ -70,7 +70,5 @@ A2;B2;C2
 Реализовано без сторонних библиотек, только Java  
 
 Входных файлов в репозитории нет т.к. они занимают много места.  
-Зато есть результаты:  
-[lng-out.txt](https://github.com/duvik114/SNM/blob/main/src/disjoint/set/union/lng-out.txt) для [lng.csv](https://github.com/PeacockTeam/new-job/blob/master/lng.7z)  
-[lng-big-out.txt](https://github.com/duvik114/SNM/blob/main/src/disjoint/set/union/lng-out-big.txt) для [lng-big.csv](https://github.com/PeacockTeam/new-job/releases/download/v1.0/lng-big.7z)  
+Зато есть результаты в [answers.zip](https://github.com/duvik114/SNM/blob/main/answers.zip) (lng-out.txt, lng-big-out.txt)  
 © 2022 GitHub, In
