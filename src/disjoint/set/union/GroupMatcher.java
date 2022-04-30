@@ -10,7 +10,7 @@ public class GroupMatcher {
     private final String OUTPUT_FILE;
     private final static int COL_NUM = 3;
     private final LinkedHashSet<String> strings;
-    private final ArrayList<HashMap<Long, Integer>> wordsMaps;
+    private final ArrayList<HashMap<Double, Integer>> wordsMaps;
 
     public GroupMatcher(String INPUT_FILE, String OUTPUT_FILE) {
         this.INPUT_FILE = INPUT_FILE;
@@ -19,15 +19,18 @@ public class GroupMatcher {
         this.wordsMaps = new ArrayList<>();
     }
 
-    private Long[] splitString(String s) throws GroupMatchException {
-        String[] tokens = s.split(";");
+    private Double[] splitString(String s) throws GroupMatchException {
+        String[] tokens = s.split(";", -1);
 
         if (tokens.length != COL_NUM) {
             throw new GroupMatchException("Wrong number of columns (should be " + COL_NUM + "): " + s);
         }
 
-        for (String t : tokens) {
-            if (t.length() < 2) {
+        for (int i = 0; i < tokens.length; i++) {
+            if (tokens[i].isEmpty()) {
+                tokens[i] = "\"\"";
+            }
+            else if (tokens[i].length() < 2) {
                 throw new GroupMatchException("Wrong string in input file: " + s);
             }
         }
@@ -39,10 +42,10 @@ public class GroupMatcher {
                         if (t.isEmpty()) {
                             return null;
                         } else {
-                            return Long.valueOf(t);
+                            return Double.valueOf(t);
                         }
                     })
-                    .toArray(Long[]::new);
+                    .toArray(Double[]::new);
         } catch (NumberFormatException e) {
             throw new GroupMatchException("Cannot format string to numbers: " + s);
         }
@@ -58,7 +61,7 @@ public class GroupMatcher {
             int lineNum = 0;
             while ((line = br.readLine()) != null) {
 
-                Long[] values;
+                Double[] values;
                 try {
                     values = splitString(line);
                 } catch (GroupMatchException e) {
@@ -88,9 +91,9 @@ public class GroupMatcher {
         dsu.addString(lineNum);
     }
 
-    private void checkColumns(DSU dsu, int lineNum, Long[] values) {
+    private void checkColumns(DSU dsu, int lineNum, Double[] values) {
         for (int i = 0; i < COL_NUM; i++) {
-            Long value = values[i];
+            Double value = values[i];
 
             if (value == null) {
                 continue;
@@ -104,7 +107,7 @@ public class GroupMatcher {
         }
     }
 
-    private void printGroups(DSU dsu) {
+    private int printGroups(DSU dsu, long timeStart) throws GroupMatchException {
         int i = 1;
         String[] pos = new String[1];
         Group[] groups = dsu.getGroupsAndPos(pos);
@@ -114,15 +117,16 @@ public class GroupMatcher {
             File output = new File(OUTPUT_FILE);
             output.createNewFile();
         } catch (IOException e) {
-            System.err.println("Error creating output file");
-            return;
+            throw new GroupMatchException("Error creating output file");
         }
 
         BufferedWriter writer;
         try {
             writer = new BufferedWriter(new FileWriter(OUTPUT_FILE, StandardCharsets.UTF_8));
+
             writer.write("Number of groups containing more than 1 string: " + pos[0]);
             writer.newLine();
+
             for (Group g : groups) {
                 writer.write("Group " + i++ + ":");
                 writer.newLine();
@@ -131,12 +135,21 @@ public class GroupMatcher {
                     writer.newLine();
                 }
             }
-            writer.write("Groups count: " + groups.length);
+
+            writer.write("================================================================");
             writer.newLine();
+
+            writer.write("Number of groups: " + groups.length);
+            writer.newLine();
+
+            writer.write("Done in " + ((System.currentTimeMillis() - timeStart) / 1000) + " seconds!");
+            writer.newLine();
+
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new GroupMatchException("Error writing to output file: " + e.getMessage());
         }
+        return groups.length;
     }
 
     private static void printUsage() {
@@ -162,9 +175,16 @@ public class GroupMatcher {
             return;
         }
 
-        groupMatcher.printGroups(dsu);
+        int groupsCount;
+        try {
+            groupsCount = groupMatcher.printGroups(dsu, timeStart);
+        } catch (GroupMatchException e) {
+            System.err.println(e.getMessage());
+            return;
+        }
 
-        System.out.println("===========================================================");
+        System.out.println("================================================================");
+        System.out.println("Number of groups: " + groupsCount);
         System.out.println("Done in " + ((System.currentTimeMillis() - timeStart) / 1000) + " seconds!");
     }
 }

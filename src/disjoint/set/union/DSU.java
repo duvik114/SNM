@@ -46,7 +46,7 @@ public class DSU {
 
     private void getPos(String[] posString, Group[] res) {
         int pos = 0;
-        while (res[pos].getStrings().size() > 1) {
+        while (pos < res.length && res[pos].getStrings().size() > 1) {
             pos++;
         }
         posString[0] = String.valueOf(pos);
