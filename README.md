@@ -69,4 +69,8 @@ A2;B2;C2
 Файлы ввода и вывода должны лежать в той же директории что и [GroupMatcher](https://github.com/duvik114/SNM/blob/main/src/disjoint/set/union/GroupMatcher.java)  
 Реализовано без сторонних библиотек, только Java  
 
+Входных файлов в репозитории нет т.к. они занимают много места.  
+Зато есть результаты:  
+[lng-out.txt](https://github.com/duvik114/SNM/blob/main/src/disjoint/set/union/lng-out.txt) для [lng.csv](https://github.com/PeacockTeam/new-job/blob/master/lng.7z)  
+[lng-big-out.txt](https://github.com/duvik114/SNM/blob/main/src/disjoint/set/union/lng-out-big.txt) для [lng-big.csv](https://github.com/PeacockTeam/new-job/releases/download/v1.0/lng-big.7z)  
 © 2022 GitHub, In
