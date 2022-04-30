@@ -8,7 +8,6 @@ public class GroupMatcher {
 
     private final String INPUT_FILE;
     private final String OUTPUT_FILE;
-    private final static int COL_NUM = 3;
     private final LinkedHashSet<String> strings;
     private final ArrayList<HashMap<Double, Integer>> wordsMaps;
 
@@ -21,10 +20,6 @@ public class GroupMatcher {
 
     private Double[] splitString(String s) throws GroupMatchException {
         String[] tokens = s.split(";", -1);
-
-        if (tokens.length != COL_NUM) {
-            throw new GroupMatchException("Wrong number of columns (should be " + COL_NUM + "): " + s);
-        }
 
         for (int i = 0; i < tokens.length; i++) {
             if (tokens[i].isEmpty()) {
@@ -51,15 +46,15 @@ public class GroupMatcher {
         }
     }
 
-    private void getSNM(DSU dsu) throws GroupMatchException {
-        for (int i = 0; i < COL_NUM; i++) {
-            wordsMaps.add(new HashMap<>());
-        }
-
+    private void readToSNM(DSU dsu) throws GroupMatchException {
         try (BufferedReader br = new BufferedReader(new FileReader(INPUT_FILE, StandardCharsets.UTF_8))) {
             String line;
             int lineNum = 0;
             while ((line = br.readLine()) != null) {
+
+                if (line.isEmpty()) {
+                    continue;
+                }
 
                 Double[] values;
                 try {
@@ -92,11 +87,15 @@ public class GroupMatcher {
     }
 
     private void checkColumns(DSU dsu, int lineNum, Double[] values) {
-        for (int i = 0; i < COL_NUM; i++) {
+        for (int i = 0; i < values.length; i++) {
             Double value = values[i];
 
             if (value == null) {
                 continue;
+            }
+
+            while (i >= wordsMaps.size()) {
+                wordsMaps.add(new HashMap<>());
             }
 
             if (wordsMaps.get(i).containsKey(value)) {
@@ -142,7 +141,7 @@ public class GroupMatcher {
             writer.write("Number of groups: " + groups.length);
             writer.newLine();
 
-            writer.write("Done in " + ((System.currentTimeMillis() - timeStart) / 1000) + " seconds!");
+            writer.write("Done in " + ((System.currentTimeMillis() - timeStart) / 1000.0) + " seconds!");
             writer.newLine();
 
             writer.close();
@@ -169,7 +168,7 @@ public class GroupMatcher {
         GroupMatcher groupMatcher = new GroupMatcher(args[0], args[1]);
 
         try {
-            groupMatcher.getSNM(dsu);
+            groupMatcher.readToSNM(dsu);
         } catch (GroupMatchException e) {
             System.err.println(e.getMessage());
             return;
@@ -185,6 +184,6 @@ public class GroupMatcher {
 
         System.out.println("================================================================");
         System.out.println("Number of groups: " + groupsCount);
-        System.out.println("Done in " + ((System.currentTimeMillis() - timeStart) / 1000) + " seconds!");
+        System.out.println("Done in " + ((System.currentTimeMillis() - timeStart) / 1000.0) + " seconds!");
     }
 }
